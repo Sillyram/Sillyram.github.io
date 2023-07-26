@@ -9,8 +9,9 @@ html{line-height:1.15;-webkit-text-size-adjust:100%}*,:after,:before{box-sizing:
 }
 
 ::-webkit-scrollbar-thumb{
-	background:linear-gradient(90deg, #000, #fff);
+	background:#555;
+	border-radius:10px;
 }
 ::-webkit-scrollbar-thumb:hover{
-	background:linear-gradient(90deg, #555, #aaa);
+	background:#333;
 }
