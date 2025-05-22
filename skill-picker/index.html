@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Skill Picker</title>
+        <style>
+            * {
+                font-family: Calibri, Arial, sans-serif;
+                color: #eee;
+                box-sizing: border-box;
+            }
+
+            ::placeholder {
+                color: rgba(110, 110, 110, 0.5); /* Fixed alpha to 0.5 */
+            }
+
+            body {
+                background-color: #171e22;
+                padding: 20px;
+                margin: 0;
+            }
+
+            .head {
+                background-color: #111415;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                margin: 0 0 20px 0;
+                font-weight: 700;
+                font-size: 2rem;
+            }
+
+            /* Settings container: flex wrap with gap for neat rows */
+            .settings {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px 25px;
+                align-items: center;
+            }
+
+            /* Each label is a flex container: label text + input aligned horizontally */
+            .settings label {
+                background-color: #202527;
+                border-radius: 15px;
+                padding: 10px 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1 1 250px;
+                color: #ccc;
+                font-weight: 600;
+                cursor: default;
+            }
+
+            /* Inputs inside label: consistent styling */
+            .settings input[type="text"],
+            .settings input[type="number"] {
+                flex-grow: 1;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 1rem;
+                color: #EEE;
+                background-color: #111415;
+                outline: none;
+            }
+
+            /* Checkbox label style overrides */
+            .settings label input[type="checkbox"] {
+                width: auto;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+
+            /* Button styling consistent */
+            .nice-btn {
+                background-color: #53a6ff;
+                font-weight: 900;
+                color: #eee;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                user-select: none;
+            }
+
+            .nice-btn:hover {
+            background-color: #407cd8;
+            }
+
+            /* Controls area */
+            .controls {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .controls input[type="text"] {
+                flex-grow: 1;
+                min-width: 180px;
+                padding: 10px 12px;
+                border-radius: 10px;
+                border: none;
+                font-size: 1rem;
+                color: #222;
+            }
+
+            .controls button {
+                padding: 12px 20px;
+            }
+
+            /* Points left text */
+            .controls p {
+                margin: 0;
+                color: #bbb;
+                font-weight: 600;
+                min-width: 150px;
+            }
+
+            /* Skill container: flex row, center aligned */
+            .skill-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 12px;
+            }
+
+            /* Label fixed width and bold */
+            .label {
+                width: 140px;
+                font-weight: 700;
+                color: #a0d8ff;
+                user-select: none;
+            }
+
+            /* Value text fixed width, center aligned */
+            .value-text {
+                width: 70px;
+                text-align: center;
+                font-weight: 700;
+                user-select: none;
+                color: #eee;
+            }
+
+            /* Delete button smaller and subtle */
+            .delete-btn {
+                background: #ff5f5f;
+                color: #222;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 10px;
+                font-weight: 700;
+                cursor: pointer;
+                user-select: none;
+                transition: background-color 0.3s;
+            }
+
+            .delete-btn:hover {
+            background: #e04343;
+            }
+
+            /* Import/export area centered and styled */
+            .import-export {
+                margin-top: 30px;
+                text-align: center;
+            }
+
+            #importText {
+                width: 60%;
+                min-width: 300px;
+                height: 120px;
+                margin-bottom: 10px;
+                padding: 15px;
+                border-radius: 12px;
+                border: none;
+                font-size: 1rem;
+                color: #222;
+                resize: vertical;
+            }
+
+            /* Buttons in import/export area */
+            .import-export button {
+                margin: 5px 10px;
+                padding: 12px 25px;
+                border-radius: 10px;
+                border: none;
+                background-color: #53a6ff;
+                color: #eee;
+                font-weight: 900;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .import-export button:hover {
+                
+            }
+
+            @keyframes rainbowText {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            .rainbow-text {
+                background: linear-gradient(
+                    270deg,
+                    #ff0000,
+                    #ff9900,
+                    #ffff00,
+                    #33cc33,
+                    #3399ff,
+                    #9900cc,
+                    #ff0000
+                );
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: rainbowText 18s ease infinite;
+            }
+
+            .skill-bar {
+                position: relative;
+                flex-grow: 1;
+                height: 28px;
+                border-radius: 8px;
+                overflow: hidden;
+                background: linear-gradient(145deg, #1c2428, #13191c);
+                border: 1px solid #000;
+                box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1),
+                            0 0 10px rgba(0, 0, 0, 0.5);
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+            .skill-bar:hover {
+                box-shadow: 0 0 10px #53a6ff88, inset 0 1px 3px rgba(255, 255, 255, 0.2);
+                background: linear-gradient(145deg, #394952, #103142);
+            }
+
+            /* Animated fill with a gradient shimmer */
+            .fill {
+                height: 100%;
+                background: #66d9ff; /* Static base light blue */
+                width: 0%;
+                transition: width 0.15s ease-in-out;
+                border-radius: 8px 0 0 8px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Pseudo-element for shimmer effect */
+            .fill::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    120deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.6),
+                    transparent
+                );
+                opacity: 0;
+                pointer-events: none;
+                transition: none;
+            }
+
+            .fill.shimmer::after {
+                animation: shimmer-once 1s ease-out forwards;
+                opacity: 1;
+            }
+
+            @keyframes shimmer-once {
+                0% {
+                    left: -100%;
+                    opacity: 0.5;
+                }
+                50% {
+                    left: 50%;
+                    opacity: 1;
+                }
+                100% {
+                    left: 100%;
+                    opacity: 0;
+                }
+            }
+
+            .newSkill {
+                width: 83%;
+                border: 2px #333 dashed;
+                border-radius: 15px;
+                padding: 20px;
+                background-color: #111415;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="head">
+            <h1 class="rainbow-text">Silly's Character Skill Picker</h1>
+
+            <div class="settings">
+                <label>Character Name: <input type="text" id="characterName" placeholder="Jane Doe"></label>
+                <label>Max Points per Bar: <input type="number" id="maxPoints" value="20"></label>
+                <label>Points to Spend: <input type="number" id="pointsToSpend" value="70"></label>
+                <label>Default Value (optional): <input type="number" id="defaultValue" value="10"></label>
+                <label><input type="checkbox" id="startFromMiddle" checked> Start from Middle</label>
+                <button class="nice-btn" style="float:left;" onclick="initialize()">Set Config</button><br /><br />
+            </div>
+        </div>
+
+        <div class="head">
+            <div class="controls">
+                <!-- <input type="text" id="skillName" placeholder="Enter skill name">
+                <button class="nice-btn" onclick="addSkill()">Add Skill</button> -->
+                <button class="nice-btn" onclick="equalise()">Equalise</button>
+                <p>Points left: <span id="pointsLeft"></span></p>
+            </div>
+        </div>
+
+        <div class="head">
+            <div id="skills"></div>
+            <div class="addNewSkill">
+                <center><input class="newSkill" type="text" id="skillName" autocomplete="off" style="text-align: center; outline: none; box-shadow: none;" placeholder="Add a new skill"></center>
+            </div>
+            <center><p style="color: #454545;">Left click to add, shift left click to reduce</p></center>
+        </div>
+
+        <div class="head">
+            <div class="import-export">
+                <textarea id="importText" placeholder="Paste skill data here..."></textarea><br />
+                <button class="nice-btn" onclick="importSkills()">Import</button> <button class="nice-btn" onclick="exportSkills()">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <script>
+            let maxPoints = 20;
+            let pointsToSpend = 70;
+            let startFromMiddle = true;
+            let defaultValue = null;
+            const skills = [];
+
+            const starterSkills = ["Agility", "Charisma", "Fortitude", "Intelligence", "Medical", "Ranged", "Strength"];
+            const skillsDiv = document.getElementById("skills");
+            const pointsLeftSpan = document.getElementById("pointsLeft");
+
+            function initialize() {
+                maxPoints = parseInt(document.getElementById("maxPoints").value) || 20;
+                const totalAvailable = parseInt(document.getElementById("pointsToSpend").value) || 70;
+                const defaultInput = document.getElementById("defaultValue").value;
+                defaultValue = defaultInput === "" ? 70 : parseInt(defaultInput) || 10;
+                startFromMiddle = document.getElementById("startFromMiddle").checked;
+
+                skills.length = 0;
+                skillsDiv.innerHTML = "";
+
+                const numSkills = starterSkills.length;
+
+                // Determine the even target value per skill (same as equalise logic)
+                let targetValue = Math.floor(totalAvailable / numSkills);
+                targetValue = Math.min(targetValue, defaultValue, maxPoints);
+
+                // Calculate unspent leftover
+                pointsToSpend = totalAvailable - (targetValue * numSkills);
+
+                // Add all starter skills with equal targetValue
+                starterSkills.forEach(name => addSkill(name, targetValue));
+
+                updatePointsLeft();
+            }
+
+
+
+            function updatePointsLeft() {
+                pointsLeftSpan.textContent = pointsToSpend;
+            }
+
+            function addSkill(name = null, value = null) {
+            name = name || document.getElementById("skillName").value;
+            if (!name) return;
+
+            if (value === null) {
+                if (defaultValue !== null) {
+                value = Math.min(defaultValue, pointsToSpend, maxPoints);
+                pointsToSpend -= value;
+                } else if (startFromMiddle) {
+                value = Math.min(Math.floor(maxPoints / 2), pointsToSpend);
+                pointsToSpend -= value;
+                } else {
+                value = 0;
+                }
+            }
+
+            const skill = { name, value };
+            skills.push(skill);
+
+            const container = document.createElement("div");
+            container.className = "skill-container";
+
+            const label = document.createElement("div");
+            label.className = "label";
+            label.textContent = name;
+            container.appendChild(label);
+
+            const bar = document.createElement("div");
+            bar.className = "skill-bar";
+            const fill = document.createElement("div");
+            fill.className = "fill";
+            fill.style.width = `${(value / maxPoints) * 100}%`;
+            bar.appendChild(fill);
+            container.appendChild(bar);
+
+            const valueText = document.createElement("div");
+            valueText.className = "value-text";
+            valueText.textContent = `${value} / ${maxPoints}`;
+            container.appendChild(valueText);
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-btn";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = () => {
+                pointsToSpend += skill.value;
+                skillsDiv.removeChild(container);
+                skills.splice(skills.indexOf(skill), 1);
+                updatePointsLeft();
+            };
+            container.appendChild(deleteBtn);
+
+            bar.addEventListener("click", (e) => {
+                if (e.shiftKey || e.button === 2) {
+                if (skill.value > 0) {
+                    skill.value--;
+                    pointsToSpend++;
+                }
+                } else {
+                if (pointsToSpend > 0 && skill.value < maxPoints) {
+                    skill.value++;
+                    pointsToSpend--;
+                }
+                }
+                fill.style.width = `${(skill.value / maxPoints) * 100}%`;
+                valueText.textContent = `${skill.value} / ${maxPoints}`;
+                // Trigger one-time shimmer effect
+                fill.classList.remove("shimmer"); // Reset in case it was added before
+                void fill.offsetWidth; // Force reflow to restart animation
+                fill.classList.add("shimmer");
+                updatePointsLeft();
+            });
+
+            bar.addEventListener("contextmenu", e => e.preventDefault());
+            skillsDiv.appendChild(container);
+            updatePointsLeft();
+            document.getElementById("skillName").value = '';
+            }
+
+            function equalise() {
+                const maxPoints = parseInt(document.getElementById("maxPoints").value) || 20;       // max per skill
+                const totalAvailable = parseInt(document.getElementById("pointsToSpend").value) || 70; // total points available
+                const barDefault = parseInt(document.getElementById("defaultValue").value) || 10;   // default per skill
+
+                const numSkills = skills.length;
+                if (numSkills === 0) return; // safety
+
+                // Calculate the max equal value all skills can have without exceeding total points
+                // floor of totalAvailable / numSkills ensures equal distribution without leftovers being assigned
+                let targetValue = Math.floor(totalAvailable / numSkills);
+
+                // Clamp targetValue so it doesn't exceed barDefault or maxPoints
+                targetValue = Math.min(targetValue, barDefault, maxPoints);
+
+                // Assign targetValue to ALL skills (same value)
+                skills.forEach(skill => skill.value = targetValue);
+
+                // Calculate leftover points that remain unassigned
+                let leftover = totalAvailable - (targetValue * numSkills);
+
+                // Update DOM bars and values
+                const bars = document.querySelectorAll(".skill-bar .fill");
+                const values = document.querySelectorAll(".value-text");
+
+                skills.forEach((s, i) => {
+                    bars[i].style.width = `${(s.value / maxPoints) * 100}%`;
+                    values[i].textContent = `${s.value} / ${maxPoints}`;
+                });
+
+                // Update global pointsToSpend to leftover points
+                pointsToSpend = leftover;
+                updatePointsLeft();
+            }
+
+
+            function exportSkills() {
+            const character = document.getElementById("characterName").value.trim();
+            let output = "";
+
+            if (character) {
+                output += `**\`[${character}]\`**\n`;
+            }
+
+            skills.forEach(skill => {
+                output += `**\`${skill.name}\`** ${skill.value}/${maxPoints}\n`;
+            });
+
+            navigator.clipboard.writeText(output).then(() => {
+                alert("Skills copied to clipboard!");
+            });
+            }
+
+            function importSkills() {
+                const text = document.getElementById("importText").value.trim();
+                if (!text.includes("**`")) return alert("Invalid format");
+
+                const lines = text.split("\n");
+                skills.length = 0;
+                skillsDiv.innerHTML = "";
+
+                let totalSpent = 0;
+                let newSkills = [];
+
+                lines.forEach((line, idx) => {
+                    if (idx === 0 && line.includes("**`[") && line.includes("]`**")) {
+                        const charName = line.match(/\*\*`\[(.+?)\]`\*\*/);
+                        if (charName) {
+                            document.getElementById("characterName").value = charName[1];
+                        }
+                        return;
+                    }
+
+                    const match = line.match(/\*\*`(.+?)`\*\*\s+(\d+)\/(\d+)/);
+                    if (match) {
+                        const name = match[1];
+                        const val = parseInt(match[2]);
+                        const max = parseInt(match[3]);
+                        if (!isNaN(val) && !isNaN(max)) {
+                            totalSpent += val;
+                            newSkills.push({ name, value: val, max });
+                        }
+                    }
+                });
+
+                maxPoints = newSkills[0]?.max || 20;
+                pointsToSpend = Math.max(0, maxPoints * newSkills.length - totalSpent);
+                updatePointsLeft();
+
+                newSkills.forEach(skill => addSkill(skill.name, skill.value));
+            }
+
+            document.getElementById("skillName").addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    addSkill();
+                }
+            });
+
+            initialize();
+        </script>
+    </body>
+</html>
