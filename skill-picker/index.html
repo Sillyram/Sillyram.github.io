@@ -172,15 +172,29 @@
 
             #importText {
                 width: 60%;
+                background-color: #0b0d0d;
                 min-width: 300px;
                 height: 120px;
                 margin-bottom: 10px;
-                padding: 15px;
+                padding: 5px;
                 border-radius: 12px;
-                border: none;
+                border: 0px solid #0b0d0d;
                 font-size: 1rem;
-                color: #222;
+                color: #eee;
                 resize: vertical;
+                outline: none;
+                transition: 0.2s;
+            }
+
+            #importText:hover{
+                background-color: #070909;
+            }
+
+            #importText:focus{
+                box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5) inset;
+                outline: none;
+                background-color: #0b0d0d;
+                border: 2px solid #103142;
             }
 
             /* Buttons in import/export area */
@@ -194,10 +208,6 @@
                 font-weight: 900;
                 cursor: pointer;
                 transition: background-color 0.3s;
-            }
-
-            .import-export button:hover {
-                
             }
 
             @keyframes rainbowText {
@@ -218,6 +228,7 @@
                     #ff0000
                 );
                 background-size: 200% 200%;
+                background-clip: text;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: rainbowText 18s ease infinite;
@@ -298,6 +309,15 @@
                 border-radius: 15px;
                 padding: 20px;
                 background-color: #111415;
+                transition: 0.2s;
+            }
+
+            .newSkill:hover{
+                background-color: #0b0d0d;
+            }
+
+            .newSkill:focus{
+                background-color: #0b0d0d;
             }
         </style>
     </head>
@@ -361,10 +381,13 @@
                 skillsDiv.innerHTML = "";
 
                 const numSkills = starterSkills.length;
+                let targetValue = 0;
 
                 // Determine the even target value per skill (same as equalise logic)
-                let targetValue = Math.floor(totalAvailable / numSkills);
-                targetValue = Math.min(targetValue, defaultValue, maxPoints);
+                if(startFromMiddle){
+                    targetValue = Math.floor(totalAvailable / numSkills);
+                    targetValue = Math.min(targetValue, defaultValue, maxPoints);
+                }
 
                 // Calculate unspent leftover
                 pointsToSpend = totalAvailable - (targetValue * numSkills);
