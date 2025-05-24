@@ -405,19 +405,19 @@
             }
 
             function addSkill(name = null, value = null) {
-            name = name || document.getElementById("skillName").value;
-            if (!name) return;
+                name = name || document.getElementById("skillName").value;
+                if (!name) return;
 
-            if (value === null) {
-                if (defaultValue !== null) {
-                value = Math.min(defaultValue, pointsToSpend, maxPoints);
-                pointsToSpend -= value;
-                } else if (startFromMiddle) {
-                value = Math.min(Math.floor(maxPoints / 2), pointsToSpend);
-                pointsToSpend -= value;
-                } else {
-                value = 0;
-                }
+                if (value === null) {
+                    if (defaultValue !== null) {
+                    value = Math.min(defaultValue, pointsToSpend, maxPoints);
+                    pointsToSpend -= value;
+                    } else if (startFromMiddle) {
+                    value = Math.min(Math.floor(maxPoints / 2), pointsToSpend);
+                    pointsToSpend -= value;
+                    } else {
+                    value = 0;
+                    }
             }
 
             const skill = { name, value };
@@ -477,9 +477,9 @@
             });
 
             bar.addEventListener("contextmenu", e => e.preventDefault());
-            skillsDiv.appendChild(container);
-            updatePointsLeft();
-            document.getElementById("skillName").value = '';
+                skillsDiv.appendChild(container);
+                updatePointsLeft();
+                document.getElementById("skillName").value = '';
             }
 
             function equalise() {
@@ -519,47 +519,92 @@
 
 
             function exportSkills() {
-            const character = document.getElementById("characterName").value.trim();
-            let output = "";
+                const character = document.getElementById("characterName").value.trim() || "Unnamed Character";
 
-            if (character) {
-                output += `**\`[${character}]\`**\n`;
+                // Compose skill data string like "Agility:8,Charisma:12,Fortitude:10"
+                const skillData = skills.map(s => `${s.name}:${s.value}`).join(",");
+
+                // Compose compact code string: "Character|skillData@maxPoints|pointsToSpend"
+                const compactCode = `${character}|${skillData}@${maxPoints}|${pointsToSpend}`;
+
+                // Build export text with Discord formatting + compact code block
+                let output = "";
+                if (character) {
+                    output += `**\`[${character}]\`**\n`;
+                }
+
+                skills.forEach(skill => {
+                    output += `**\`${skill.name}\`** ${skill.value}/${maxPoints}\n`;
+                });
+
+                output += `\n-# Copy-Code:\n\`\`\`${compactCode}\`\`\``;
+
+                navigator.clipboard.writeText(output).then(() => {
+                    alert("Skills copied to clipboard with compact code!");
+                });
             }
 
-            skills.forEach(skill => {
-                output += `**\`${skill.name}\`** ${skill.value}/${maxPoints}\n`;
-            });
-
-            navigator.clipboard.writeText(output).then(() => {
-                alert("Skills copied to clipboard!");
-            });
-            }
 
             function importSkills() {
-                const text = document.getElementById("importText").value.trim();
-                if (!text.includes("**`")) return alert("Invalid format");
+                let text = document.getElementById("importText").value.trim();
 
-                const lines = text.split("\n");
-                skills.length = 0;
-                skillsDiv.innerHTML = "";
+                skills.length = 0;        // Clear current skills
+                skillsDiv.innerHTML = ""; // Clear UI
 
+                let characterName = "";
                 let totalSpent = 0;
-                let newSkills = [];
+
+                // Check if input looks like a raw compact code:
+                // Pattern: "Character|skill1:val,...@maxPoints|pointsToSpend"
+                const compactCodePattern = /^([^|]+)\|([a-zA-Z0-9:,]+)@(\d+)\|(\d+)$/;
+
+                if (compactCodePattern.test(text)) {
+                    // Parse compact code parts
+                    const [, charPart, skillPart, maxPointsStr, pointsToSpendStr] = text.match(compactCodePattern);
+
+                    characterName = charPart;
+                    maxPoints = parseInt(maxPointsStr, 10);
+                    pointsToSpend = parseInt(pointsToSpendStr, 10);
+
+                    if (characterName) {
+                        document.getElementById("characterName").value = characterName;
+                    }
+
+                    // Parse skill entries
+                    skillPart.split(",").forEach(entry => {
+                        const [name, valStr] = entry.split(":");
+                        const val = parseInt(valStr, 10);
+                        if (name && !isNaN(val)) {
+                            skills.push({ name, value: val, max: maxPoints });
+                            totalSpent += val;
+                        }
+                    });
+
+                    updatePointsLeft();
+                    skills.forEach(skill => addSkill(skill.name, skill.value));
+                    return; // done importing compact code
+                }
+
+                // Fallback parsing from full export text
+                const lines = text.split("\n");
+                totalSpent = 0;
+                const newSkills = [];
 
                 lines.forEach((line, idx) => {
                     if (idx === 0 && line.includes("**`[") && line.includes("]`**")) {
-                        const charName = line.match(/\*\*`\[(.+?)\]`\*\*/);
-                        if (charName) {
-                            document.getElementById("characterName").value = charName[1];
+                        const charMatch = line.match(/\*\*`\[(.+?)\]`\*\*/);
+                        if (charMatch) {
+                            characterName = charMatch[1];
+                            document.getElementById("characterName").value = characterName;
                         }
                         return;
                     }
 
-                    const match = line.match(/\*\*`(.+?)`\*\*\s+(\d+)\/(\d+)/);
-                    if (match) {
-                        const name = match[1];
-                        const val = parseInt(match[2]);
-                        const max = parseInt(match[3]);
+                    const skillMatch = line.match(/\*\*`(.+?)`\*\*\s+(\d+)\/(\d+)/);
+                    if (skillMatch) {
+                        const name = skillMatch[1];
+                        const val = parseInt(skillMatch[2], 10);
+                        const max = parseInt(skillMatch[3], 10);
                         if (!isNaN(val) && !isNaN(max)) {
                             totalSpent += val;
                             newSkills.push({ name, value: val, max });
@@ -567,12 +612,17 @@
                     }
                 });
 
-                maxPoints = newSkills[0]?.max || 20;
-                pointsToSpend = Math.max(0, maxPoints * newSkills.length - totalSpent);
-                updatePointsLeft();
+                if (newSkills.length > 0) {
+                    // Calculate how many points remain
+                    pointsToSpend = Math.max(0, document.getElementById("pointsToSpend").value - totalSpent);
 
-                newSkills.forEach(skill => addSkill(skill.name, skill.value));
+                    updatePointsLeft();
+
+                    newSkills.forEach(skill => addSkill(skill.name, skill.value));
+                    skills.push(...newSkills);
+                }
             }
+
 
             document.getElementById("skillName").addEventListener("keydown", function(e) {
                 if (e.key === "Enter") {
