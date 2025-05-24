@@ -22,9 +22,9 @@
 
             .head {
                 background-color: #111415;
-                padding: 20px;
+                padding: 15px;
                 border-radius: 8px;
-                margin-bottom: 20px;
+                margin-bottom: 10px;
             }
 
             h1 {
@@ -166,7 +166,6 @@
 
             /* Import/export area centered and styled */
             .import-export {
-                margin-top: 30px;
                 text-align: center;
             }
 
@@ -319,6 +318,13 @@
             .newSkill:focus{
                 background-color: #0b0d0d;
             }
+
+            .textHighlight{
+                padding: 4px;
+                border: 2px #333 solid;
+                border-radius: 5px;
+                color: #888;
+            }
         </style>
     </head>
     <body>
@@ -337,22 +343,20 @@
 
         <div class="head">
             <div class="controls">
-                <!-- <input type="text" id="skillName" placeholder="Enter skill name">
-                <button class="nice-btn" onclick="addSkill()">Add Skill</button> -->
                 <button class="nice-btn" onclick="equalise()">Equalise</button>
                 <p>Points left: <span id="pointsLeft"></span></p>
             </div>
         </div>
 
         <div class="head">
+            <center><p style="color: #454545;"><span class="textHighlight">Left click</span> to add, <span class="textHighlight">shift left click</span> to reduce</p></center>
             <div id="skills"></div>
             <div class="addNewSkill">
                 <center><input class="newSkill" type="text" id="skillName" autocomplete="off" style="text-align: center; outline: none; box-shadow: none;" placeholder="Add a new skill"></center>
             </div>
-            <center><p style="color: #454545;">Left click to add, shift left click to reduce</p></center>
         </div>
 
-        <div class="head">
+        <div class="head" style="padding: 10px; margin-bottom: 0px;">
             <div class="import-export">
                 <textarea id="importText" placeholder="Paste skill data here..."></textarea><br />
                 <button class="nice-btn" onclick="importSkills()">Import</button> <button class="nice-btn" onclick="exportSkills()">Copy to Clipboard</button>
