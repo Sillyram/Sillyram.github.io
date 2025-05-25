@@ -375,6 +375,18 @@
             const pointsLeftSpan = document.getElementById("pointsLeft");
 
             function initialize() {
+                const hash = window.location.hash;
+                if(hash.startsWith("#=")) {
+                    const importCode = decodeURIComponent(hash.slice(2));
+                    console.log("Importing Character from URL:", importCode);
+
+                    importSkills(importCode);
+
+                    // Clear the hash so reloading doesn't load the character again
+                    history.replaceState(null, "", window.location.pathname);
+                    return;
+                }
+
                 maxPoints = parseInt(document.getElementById("maxPoints").value) || 20;
                 const totalAvailable = parseInt(document.getElementById("pointsToSpend").value) || 70;
                 const defaultInput = document.getElementById("defaultValue").value;
@@ -401,8 +413,6 @@
 
                 updatePointsLeft();
             }
-
-
 
             function updatePointsLeft() {
                 pointsLeftSpan.textContent = pointsToSpend;
@@ -541,7 +551,7 @@
                     output += `**\`${skill.name}\`** ${skill.value}/${maxPoints}\n`;
                 });
 
-                output += `\n-# Copy-Code:\n\`\`\`${compactCode}\`\`\``;
+                output += `\n-# Quick-Link: https://sillied.com/skill-picker/index.html#=${compactCode}`;
 
                 navigator.clipboard.writeText(output).then(() => {
                     alert("Skills copied to clipboard with compact code!");
@@ -549,8 +559,12 @@
             }
 
 
-            function importSkills() {
+            function importSkills(code = null) {
                 let text = document.getElementById("importText").value.trim();
+
+                if(code != null){
+                    text = code;
+                }
 
                 skills.length = 0;        // Clear current skills
                 skillsDiv.innerHTML = ""; // Clear UI
@@ -626,7 +640,6 @@
                     skills.push(...newSkills);
                 }
             }
-
 
             document.getElementById("skillName").addEventListener("keydown", function(e) {
                 if (e.key === "Enter") {
