@@ -169,7 +169,7 @@
                 text-align: center;
             }
 
-            #importText {
+            .textBoxes {
                 width: 60%;
                 background-color: #0b0d0d;
                 min-width: 300px;
@@ -185,11 +185,11 @@
                 transition: 0.2s;
             }
 
-            #importText:hover{
+            .textBoxes:hover{
                 background-color: #070909;
             }
 
-            #importText:focus{
+            .textBoxes:focus{
                 box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5) inset;
                 outline: none;
                 background-color: #0b0d0d;
@@ -325,6 +325,52 @@
                 border-radius: 5px;
                 color: #888;
             }
+
+            .flash-red {
+                animation: flashRed 0.3s;
+            }
+
+            @keyframes flashRed {
+                0% { background-color: #ff4c4c; }
+                100% { background-color: inherit; }
+            }
+
+            #pointsWarning {
+                position: fixed;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #ff4c4c;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 1rem;
+                z-index: 9999;
+                opacity: 0;
+                pointer-events: none;
+                animation: floatFade 2.2s ease-out;
+            }
+
+            @keyframes floatFade {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(20px);
+                }
+                20% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                80% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(-20px);
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -356,12 +402,24 @@
             </div>
         </div>
 
-        <div class="head" style="padding: 10px; margin-bottom: 0px;">
-            <div class="import-export">
-                <textarea id="importText" placeholder="Paste skill data here..."></textarea><br />
-                <button class="nice-btn" onclick="importSkills()">Import</button> <button class="nice-btn" onclick="exportSkills()">Copy to Clipboard</button>
-            </div>
+        <div class="head" style="padding: 10px; margin-bottom: 0px; display: flex; gap: 20px; justify-content: space-between;">
+        <!-- Import Side -->
+        <div class="import-section" style="flex: 1;">
+            <label for="importText">Import Code:</label><br />
+            <input type="text" class="textBoxes" id="importText" placeholder="Paste import code here..." style="width: 100%;" />
+            <button class="nice-btn" onclick="importFromInput()">Import</button>
         </div>
+
+        <!-- Export Side -->
+        <div class="export-section" style="flex: 1;">
+            <label for="exportOutput">Export Preview:</label><br />
+            <textarea id="exportOutput" class="textBoxes" readonly style="width: 100%; height: 120px;"></textarea><br />
+            <button class="nice-btn" onclick="copyFullExport()">Copy Full Export</button>
+            <button class="nice-btn" onclick="copyQuickLink()">Copy Quick-Link</button>
+        </div>
+        </div>
+
+        <div id="pointsWarning" style="display: none;">No points left!</div>
 
         <script>
             let maxPoints = 20;
@@ -412,10 +470,64 @@
                 starterSkills.forEach(name => addSkill(name, targetValue));
 
                 updatePointsLeft();
+                updateExportPreview();
+            }
+
+            function updateExportPreview() {
+                const character = document.getElementById("characterName").value.trim() || "Unnamed Character";
+                const skillData = skills.map(s => `${s.name}:${s.value}`).join(",");
+                const compactCode = `${character}|${skillData}@${maxPoints}|${pointsToSpend}`;
+
+                let output = `**\`[${character}]\`**\n`;
+                skills.forEach(skill => {
+                    output += `**\`${skill.name}\`** ${skill.value}/${maxPoints}\n`;
+                });
+                output += `\n-# Quick-Link: https://sillied.com/skill-picker/index.html#=${encodeURIComponent(compactCode)}`;
+
+                document.getElementById("exportOutput").value = output;
+            }
+
+            function copyFullExport() {
+                navigator.clipboard.writeText(document.getElementById("exportOutput").value).then(() => {
+                    alert("Full export copied!");
+                });
+            }
+
+            function copyQuickLink() {
+                const character = document.getElementById("characterName").value.trim() || "Unnamed Character";
+                const skillData = skills.map(s => `${s.name}:${s.value}`).join(",");
+                const compactCode = `${character}|${skillData}@${maxPoints}|${pointsToSpend}`;
+                const link = `https://sillied.com/skill-picker/index.html#=${encodeURIComponent(compactCode)}`;
+
+                navigator.clipboard.writeText(link).then(() => {
+                    alert("Quick link copied!");
+                });
+            }
+
+            function importFromInput() {
+                let code = document.getElementById("importText").value.trim();
+
+                // Check if it's a full link and extract the hash if so
+                const urlMatch = code.match(/#=([^#\s]+)/);
+                if (urlMatch) {
+                    code = decodeURIComponent(urlMatch[1]);
+                }
+
+                if (code) {
+                    importSkills(code);
+                }
             }
 
             function updatePointsLeft() {
                 pointsLeftSpan.textContent = pointsToSpend;
+            }
+
+            function showPointsWarning() {
+                const warning = document.getElementById("pointsWarning");
+                warning.style.display = "block";
+                warning.style.animation = "none"; // Reset animation
+                void warning.offsetWidth;         // Force reflow to restart animation
+                warning.style.animation = "floatFade 2.2s ease-out";
             }
 
             function addSkill(name = null, value = null) {
@@ -471,15 +583,23 @@
 
             bar.addEventListener("click", (e) => {
                 if (e.shiftKey || e.button === 2) {
-                if (skill.value > 0) {
-                    skill.value--;
-                    pointsToSpend++;
-                }
-                } else {
-                if (pointsToSpend > 0 && skill.value < maxPoints) {
-                    skill.value++;
-                    pointsToSpend--;
-                }
+                    if (skill.value > 0) {
+                        skill.value--;
+                        pointsToSpend++;
+                        updateExportPreview();
+                    }
+                    } else {
+                    if (pointsToSpend > 0 && skill.value < maxPoints) {
+                        skill.value++;
+                        pointsToSpend--;
+                        updateExportPreview();
+                    } else if (pointsToSpend <= 0){
+                        // Flash red when no points left
+                        fill.classList.remove("flash-red");
+                        void fill.offsetWidth; // Reflow to restart animation
+                        fill.classList.add("flash-red");
+                        showPointsWarning();
+                    }
                 }
                 fill.style.width = `${(skill.value / maxPoints) * 100}%`;
                 valueText.textContent = `${skill.value} / ${maxPoints}`;
@@ -640,6 +760,8 @@
                     skills.push(...newSkills);
                 }
             }
+
+            document.getElementById("characterName").addEventListener("input", updateExportPreview);
 
             document.getElementById("skillName").addEventListener("keydown", function(e) {
                 if (e.key === "Enter") {
