@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>Skill Picker</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             * {
                 font-family: Calibri, Arial, sans-serif;
@@ -396,37 +397,29 @@
                 }
             }
 
-            @media (max-width: 768px) {
+            @media (max-width: 768px), (max-aspect-ratio: 4/3) {
                 .head {
-                    padding: 10px;
+                    flex-direction: column;
+                    align-items: stretch;
                 }
 
-                .head .settings label,
-                .head .controls,
+                .import-export-container {
+                    flex-direction: column;
+                }
+
                 .import-section,
                 .export-section {
+                    width: 100%;
+                }
+
+                .settings label,
+                .controls button {
                     display: block;
                     width: 100%;
                 }
 
-                .import-section,
-                .export-section {
-                    flex: 1 1 100%;
-                    margin-bottom: 15px;
-                }
-
-                .head[style*="display: flex"] {
-                    flex-direction: column !important;
-                    gap: 10px !important;
-                }
-
-                .nice-btn {
-                    width: 100%;
-                    margin-top: 5px;
-                }
-
-                .textBoxes {
-                    font-size: 16px;
+                #exportOutput {
+                    height: 150px;
                 }
             }
 
@@ -490,6 +483,8 @@
             const starterSkills = ["Agility", "Charisma", "Fortitude", "Intelligence", "Medical", "Ranged", "Strength"];
             const skillsDiv = document.getElementById("skills");
             const pointsLeftSpan = document.getElementById("pointsLeft");
+
+            let lastTouchTime = 0;
 
             function initialize() {
                 const hash = window.location.hash;
@@ -671,6 +666,7 @@
 
             // Mobile and touch screen support
             bar.addEventListener("touchstart", (e) => {
+                e.preventDefault();
                 const rect = bar.getBoundingClientRect();
                 const clickX = e.touches?.[0]?.clientX ?? 0; // touch support!
                 const barMid = rect.left + rect.width / 2;
