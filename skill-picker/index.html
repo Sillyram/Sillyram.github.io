@@ -10,6 +10,11 @@
                 box-sizing: border-box;
             }
 
+            ::selection{
+                background-color: rgba(89, 0, 124, 0.596);
+                color: #fffeca;
+            }
+
             ::placeholder {
                 color: rgba(110, 110, 110, 0.5); /* Fixed alpha to 0.5 */
             }
@@ -196,6 +201,25 @@
                 border: 2px solid #103142;
             }
 
+            /* For the text boxes at the top of the page */
+            .paramBoxes {
+                background-color: #0b0d0d;
+                padding: 5px;
+                border-radius: 12px;
+                border: 0px solid #0b0d0d;
+                font-size: 1rem;
+                color: #eee;
+                outline: none;
+                transition: 0.2s;
+            }
+
+            .paramBoxes:focus{
+                box-shadow: 0px 0px 5px rgba(124, 255, 179, 0.5) inset;
+                outline: none;
+                background-color: #0b0d0d;
+                border: 2px solid #103142;
+            }
+
             /* Buttons in import/export area */
             .import-export button {
                 margin: 5px 10px;
@@ -304,9 +328,10 @@
 
             .newSkill {
                 width: 83%;
+                font-size: 12pt;
                 border: 2px #333 dashed;
                 border-radius: 15px;
-                padding: 20px;
+                padding: 10px;
                 background-color: #111415;
                 transition: 0.2s;
             }
@@ -371,6 +396,40 @@
                 }
             }
 
+            @media (max-width: 768px) {
+                .head {
+                    padding: 10px;
+                }
+
+                .head .settings label,
+                .head .controls,
+                .import-section,
+                .export-section {
+                    display: block;
+                    width: 100%;
+                }
+
+                .import-section,
+                .export-section {
+                    flex: 1 1 100%;
+                    margin-bottom: 15px;
+                }
+
+                .head[style*="display: flex"] {
+                    flex-direction: column !important;
+                    gap: 10px !important;
+                }
+
+                .nice-btn {
+                    width: 100%;
+                    margin-top: 5px;
+                }
+
+                .textBoxes {
+                    font-size: 16px;
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -378,10 +437,10 @@
             <h1 class="rainbow-text">Silly's Character Skill Picker</h1>
 
             <div class="settings">
-                <label>Character Name: <input type="text" id="characterName" placeholder="Jane Doe"></label>
-                <label>Max Points per Bar: <input type="number" id="maxPoints" value="20"></label>
-                <label>Points to Spend: <input type="number" id="pointsToSpend" value="70"></label>
-                <label>Default Value (optional): <input type="number" id="defaultValue" value="10"></label>
+                <label>Character Name: <input type="text" class="paramBoxes" id="characterName" placeholder="Jane Doe"></label>
+                <label>Max Points per Bar: <input type="number" class="paramBoxes" id="maxPoints" value="20"></label>
+                <label>Points to Spend: <input type="number" class="paramBoxes" id="pointsToSpend" value="70"></label>
+                <label>Default Value (optional): <input type="number" class="paramBoxes" id="defaultValue" value="10"></label>
                 <label><input type="checkbox" id="startFromMiddle" checked> Start from Middle</label>
                 <button class="nice-btn" style="float:left;" onclick="initialize()">Set Config</button><br /><br />
             </div>
@@ -403,20 +462,20 @@
         </div>
 
         <div class="head" style="padding: 10px; margin-bottom: 0px; display: flex; gap: 20px; justify-content: space-between;">
-        <!-- Import Side -->
-        <div class="import-section" style="flex: 1;">
-            <label for="importText">Import Code:</label><br />
-            <input type="text" class="textBoxes" id="importText" placeholder="Paste import code here..." style="width: 100%;" />
-            <button class="nice-btn" onclick="importFromInput()">Import</button>
-        </div>
+            <!-- Import Side -->
+            <div class="import-section" style="flex: 1;">
+                <label for="importText"><span class="textHighlight">Import</span></label><br />
+                <input type="text" class="textBoxes" id="importText" placeholder="Paste import code here..." style="width: 100%; margin-top: 10px;" />
+                <button class="nice-btn" onclick="importFromInput()">Import</button>
+            </div>
 
-        <!-- Export Side -->
-        <div class="export-section" style="flex: 1;">
-            <label for="exportOutput">Export Preview:</label><br />
-            <textarea id="exportOutput" class="textBoxes" readonly style="width: 100%; height: 120px;"></textarea><br />
-            <button class="nice-btn" onclick="copyFullExport()">Copy Full Export</button>
-            <button class="nice-btn" onclick="copyQuickLink()">Copy Quick-Link</button>
-        </div>
+            <!-- Export Side -->
+            <div class="export-section" style="flex: 1;">
+                <label for="exportOutput"><span class="textHighlight">Export</span></label><br />
+                <textarea id="exportOutput" class="textBoxes" readonly style="width: 100%; height: 120px; margin-top: 10px;" disabled="true"></textarea><br />
+                <button class="nice-btn" onclick="copyFullExport()">Copy Full Export</button>
+                <button class="nice-btn" onclick="copyQuickLink()">Copy Quick-Link</button>
+            </div>
         </div>
 
         <div id="pointsWarning" style="display: none;">No points left!</div>
@@ -588,7 +647,7 @@
                         pointsToSpend++;
                         updateExportPreview();
                     }
-                    } else {
+                } else {
                     if (pointsToSpend > 0 && skill.value < maxPoints) {
                         skill.value++;
                         pointsToSpend--;
@@ -609,6 +668,44 @@
                 fill.classList.add("shimmer");
                 updatePointsLeft();
             });
+
+            // Mobile and touch screen support
+            bar.addEventListener("touchstart", (e) => {
+                const rect = bar.getBoundingClientRect();
+                const clickX = e.touches?.[0]?.clientX ?? 0; // touch support!
+                const barMid = rect.left + rect.width / 2;
+
+                const isLeftSide = clickX < barMid;
+
+                if (isLeftSide) {
+                    // Left side tap = subtract
+                    if (skill.value > 0) {
+                        skill.value--;
+                        pointsToSpend++;
+                        updateExportPreview();
+                    }
+                } else {
+                    // Right side tap = add
+                    if (pointsToSpend > 0 && skill.value < maxPoints) {
+                        skill.value++;
+                        pointsToSpend--;
+                        updateExportPreview();
+                    } else if (pointsToSpend <= 0){
+                        // Flash red when no points left
+                        fill.classList.remove("flash-red");
+                        void fill.offsetWidth; // Reflow to restart animation
+                        fill.classList.add("flash-red");
+                        showPointsWarning();
+                    }
+                }
+                fill.style.width = `${(skill.value / maxPoints) * 100}%`;
+                valueText.textContent = `${skill.value} / ${maxPoints}`;
+                // Trigger one-time shimmer effect
+                fill.classList.remove("shimmer"); // Reset in case it was added before
+                void fill.offsetWidth; // Force reflow to restart animation
+                fill.classList.add("shimmer");
+                updatePointsLeft();
+            })
 
             bar.addEventListener("contextmenu", e => e.preventDefault());
                 skillsDiv.appendChild(container);
