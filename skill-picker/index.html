@@ -405,6 +405,14 @@
                 }
             }
 
+            .desktop{
+                display: initial;
+            }
+
+            .mobile{
+                display: none;
+            }
+
             @media (max-width: 768px), (max-aspect-ratio: 4/3) {
                 .head {
                     flex-direction: column;
@@ -428,6 +436,14 @@
 
                 #exportOutput {
                     height: 150px;
+                }
+
+                .desktop{
+                    display: none;
+                }
+
+                .mobile{
+                    display: initial;
                 }
             }
 
@@ -455,7 +471,12 @@
         </div>
 
         <div class="head">
-            <center><p style="color: #454545;"><span class="textHighlight">Left click</span> to add, <span class="textHighlight">shift left click</span> to reduce</p></center>
+            <span class="desktop">
+                <center><p style="color: #454545;"><span class="textHighlight">Left click</span> to add, <span class="textHighlight">shift left click</span> to reduce</p></center>
+            </span>
+            <span class="mobile">
+                <center><p style="color: #454545;">Tap the <span class="textHighlight">left</span> or <span class="textHighlight">right</span> side to remove/subtract</span></p></center>
+            </span>
             <div id="skills"></div>
             <div class="addNewSkill">
                 <center><input class="newSkill" type="text" id="skillName" autocomplete="off" style="text-align: center; outline: none; box-shadow: none;" placeholder="Add a new skill"></center>
