@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>H:B Medical Center</title>
+        <link rel="stylesheet" type="text/css" href="css/main.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="head-bar">
+                <div class="head-left"></div>
+                <h1><span style="color: #189fee; font-weight: 900;">Halo: Believe</span> Medical Center</h1>
+                <div id="toggleFlyout" class="top-button">
+                    <p>Medical Equipment</p>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="left-panel">
+                    <div class="injury-form">
+                        <div class="separator">
+                            <h2>Practitioner Details</h2>
+                            <label for="pracName">Physician Name:</label>
+                            <input id="pracName" type="text" placeholder="Name">
+                            <label for="pracGender">Physician Gender:</label>
+                            <select id="pracGender">
+                                <option>Female</option>
+                                <option>Male</option>
+                                <option>Non-Binary</option>
+                            </select>
+                        </div>
+
+                        <div class="separator">
+                            <h2>Patient Details</h2>
+                            <label for="ptName">Patient Name:</label>
+                            <input id="ptName" type="text" placeholder="Name">
+                            <label for="ptGender">Patient Gender:</label>
+                            <select id="ptGender">
+                                <option>Female</option>
+                                <option>Male</option>
+                                <option>Non-Binary</option>
+                            </select>
+                        </div>
+
+                        <div class="separator">
+                            <h2>Log Injury</h2>
+                            
+                            <label for="bodyPart">Body Part:</label>
+                            <select id="bodyPart">
+                            </select>
+
+                            <label for="injuryType">Injury Type:</label>
+                            <select id="injuryType">
+                            </select>
+
+                            <label for="notes">Notes:</label>
+                            <textarea id="notes" placeholder="Describe the injury..."></textarea>
+
+                            <button id="addInjuryBtn">Add Injury</button>
+                        </div>
+
+                        <div id="injuryLog"></div>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <div class="emote-copy">
+                        <h1>Field Emote</h1>
+                        <textarea id="field"></textarea>
+                    </div>
+                    <div class="emote-copy">
+                        <h1>Blueside Emote</h1>
+                        <textarea id="blue"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flyout Panel -->
+            <div class="flyout" id="flyoutPanel">
+                <div class="flyout-header">
+                    <h2>Medical Equipment</h2>
+                    <button class="flyout-close-btn" id="closeFlyout">X</button>
+                </div>
+                <div class="flyout-content" id="flyout-content">
+                </div>
+            </div>
+        </div>
+        <script src="js/main.js"></script>
+    </body>
+</html>

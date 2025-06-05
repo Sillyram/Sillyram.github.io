@@ -1,0 +1,381 @@
+* {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #eee;
+    box-sizing: border-box;
+}
+
+::-webkit-scrollbar{
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #4ba0d8;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #2f37aa;
+}
+
+html, body {
+    height: 100vh;
+    margin: 0px;
+    overflow: hidden;
+}
+
+.container {
+    background-color: #121212;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.head-bar {
+    background-color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.head-left {
+    flex: 1;
+}
+
+.head-bar h1 {
+    font-weight: 500;
+    font-size: 20pt;
+    text-align: center;
+    flex: 1;
+}
+
+.top-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.top-button p {
+    cursor: pointer;
+    padding: 6px 12px;
+    background-color: #333;
+    border-radius: 5px;
+    border: 2px solid #333;
+    transition: 0.2s;
+}
+
+.top-button p:hover {
+    background-color: #444;
+    border: 2px solid #777;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.flyout {
+    position: fixed;
+    top: 0;
+    right: -600px;
+    width: 600px;
+    height: 100vh;
+    background-color: #0f0f0f;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.flyout.open {
+    right: 0;
+}
+
+.flyout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #222;
+    border-bottom: 1px solid #333;
+}
+
+.flyout-header h2 {
+    margin: 0;
+}
+
+.flyout-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.genre {
+    margin-bottom: 20px;
+    background-color: #252525;
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #5a5a5a;
+}
+
+.genre h3 {
+    margin-bottom: 15px;
+    margin-left: 10px;
+    font-size: 22pt;
+    color: #ffdbdb;
+    text-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.med-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 10px;
+}
+
+.med-list li {
+    padding: 15px;
+    padding-top: 18px;
+    background-color: #222;
+    border-radius: 15px;
+}
+
+.med-name{
+    width: 100%;
+    background-color: #121212;
+    border: 2px dashed #5a5a5a;
+    text-align: center;
+    padding: 5px;
+    border-radius: 15px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.med-name:focus{
+    width: 40%;
+}
+
+.flyout-close-btn{
+    background-color: #801616;
+    border: 2px solid #a02c2c;
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-left: 7px;
+    padding-right: 7px;
+    text-align: center;
+    transition: 0.2s;
+    font-weight: 900;
+}
+.flyout-close-btn:hover{
+    background-color: #b80000;
+    border: 2px solid #801616;
+}
+
+.add-medication {
+    position: relative;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.med-name-expanded::placeholder{
+    font-weight: 900;
+}
+
+.med-name-expanded {
+    width: 100%;
+    background-color: #121212;
+    border: 2px dashed #5a5a5a;
+    text-align: center;
+    line-height: calc(height);
+    padding: 10px;
+    padding-top: 14px;
+    border-radius: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.med-fields {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.med-fields.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.med-name-input {
+    flex: 2;
+    outline: none;
+    padding: 5px;
+    padding-left: 10px;
+    padding-top: 8px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: #eee;
+    transition: 0.2s;
+}
+
+.med-name-input:focus{
+    background-color: #121212;
+}
+
+.med-strength-input {
+    flex: 1;
+    outline: none;
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: #eee;
+}
+
+.confirm-add-med {
+    background: #3a3a3a;
+    color: #eee;
+    border: none;
+    padding: 5px 10px;
+    padding-top: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.confirm-add-med:hover {
+    background-color: #4a4a4a;
+}
+
+.text-highlight{
+    border: 2px solid #5a5a5a;
+    padding: 5px;
+    padding-top: 8px;
+    border-radius: 5px;
+    background-color: #1a1a1a;
+}
+
+.tool-title{
+    font-weight: 900;
+    margin-bottom: 5px;
+}
+
+.tool-highlight{
+    border-radius: 15px;
+    background-color: #131313;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5) inset;
+}
+
+.tool-description{
+    padding-top: 0px;
+}
+
+.content{
+    display: flex;
+    flex-direction: column;
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    background-color: #1a1a1a;
+    padding: 15px;
+    overflow-y: auto;
+    border-right: 2px solid #333;
+    z-index: 900;
+}
+
+.injury-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.injury-form select,
+.injury-form textarea,
+.injury-form input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    background-color: #121212;
+    border: 1px solid #333;
+    color: #eee;
+    border-radius: 5px;
+}
+
+.injury-form button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #2a2a2a;
+    border: 2px solid #5a5a5a;
+    color: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.injury-form button:hover {
+    background-color: #3a3a3a;
+    border-color: #777;
+}
+
+.injury-log-entry {
+    margin-top: 10px;
+    padding: 8px;
+    border-left: 4px solid #666;
+    background-color: #181818;
+}
+
+.content-area {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    flex-direction: row;
+    padding: 2rem;
+    background-color: #1a1a1a;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.main-content textarea{
+    min-width: 300px;
+    min-height: 200px;
+    background-color: #131313;
+    outline: none;
+    border-radius: 15px;
+    padding: 15px;
+    border: 2px solid #777;
+}
+
+.emote-copy{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.separator{
+    padding-bottom: 15px;
+    border-bottom: 2px solid #333;
+    margin-bottom: 20px;
+}
